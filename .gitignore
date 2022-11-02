@@ -3,3 +3,4 @@
 .astro/
 *.json
 *.yaml
+*.txt
