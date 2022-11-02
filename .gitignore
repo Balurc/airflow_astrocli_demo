@@ -1,4 +1,5 @@
 .git
 .env
 airflow_settings.yaml
-astro
+.astro
+google_credentials.json
