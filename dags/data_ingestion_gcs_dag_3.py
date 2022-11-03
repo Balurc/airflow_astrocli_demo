@@ -99,6 +99,9 @@ with DAG(
 
             download_upload_data_dag(url_template=EPL_URL_TEMPLATE, local_csv_path_template=EPL_CSV_FILE_TEMPLATE, gcs_path_template=EPL_GCS_PATH_TEMPLATE)
 
+
+            
+
         #     download_dataset_task = BashOperator(
         #             task_id="download_dataset_task",
         #             bash_command=f"curl -sSLf {EPL_URL_TEMPLATE} > {EPL_CSV_FILE_TEMPLATE}"

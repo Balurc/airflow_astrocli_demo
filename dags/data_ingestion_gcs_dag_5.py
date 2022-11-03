@@ -12,9 +12,9 @@ from airflow.utils.task_group import TaskGroup
 from google.cloud import storage
 
 # Google airflow operators to interact with Bigquery to create external table
-# from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateExternalTableOperator, BigQueryInsertJobOperator
+from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateExternalTableOperator, BigQueryInsertJobOperator
 # from airflow.providers.google.cloud.transfers.gcs_to_gcs import GCSToGCSOperator
-from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
+# from airflow.providers.google.cloud.transfers.gcs_to_bigquery import GCSToBigQueryOperator
 
 # Import some env variables that we have in docker-compose.yml 
 PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
@@ -84,37 +84,37 @@ def download_upload_data(url_template, local_csv_path_template, gcs_path_templat
     download_dataset_task >> local_to_gcs_task >> rm_task
 
 
-# def move_data(league, bucket, bigquery_dataset):
-    # bigquery_external_table_task = BigQueryCreateExternalTableOperator(
-    #         task_id="bigquery_external_table_task",
-    #         table_resource={
-    #             "tableReference": {
-    #                 "projectId": project_id,
-    #                 "datasetId": bigquery_dataset,
-    #                 "tableId": f"{league}_external_table",
-    #             },
-    #             "externalDataConfiguration": {
-    #                 "autodetect": "True",
-    #                 "sourceFormat": "CSV",
-    #                 "sourceUris": [f"gs://{bucket}/football_stats/{league}/*"],
-    #             },
-    #         },
-    #     )
-    # CREATE_BQ_TBL_QUERY = (
-    #           f"CREATE OR REPLACE TABLE {bigquery_dataset}.{league} AS SELECT * FROM {bigquery_dataset}.{league}_external_table;"
-    #     )
+def move_data(project_id, league, bucket, bigquery_dataset):
+    bigquery_external_table_task = BigQueryCreateExternalTableOperator(
+            task_id="bigquery_external_table_task",
+            table_resource={
+                "tableReference": {
+                    "projectId": project_id,
+                    "datasetId": bigquery_dataset,
+                    "tableId": f"{league}_external_table",
+                },
+                "externalDataConfiguration": {
+                    "autodetect": "True",
+                    "sourceFormat": "CSV",
+                    "sourceUris": [f"gs://{bucket}/football_stats/{league}/*"],
+                },
+            },
+        )
+    CREATE_BQ_TBL_QUERY = (
+              f"CREATE OR REPLACE TABLE {bigquery_dataset}.{league} AS SELECT * FROM {bigquery_dataset}.{league}_external_table;"
+        )
 
-    # bq_create_table_job = BigQueryInsertJobOperator(
-    #         task_id="bq_create_table_job",
-    #         configuration={
-    #             "query": {
-    #                 "query": CREATE_BQ_TBL_QUERY,
-    #                 "useLegacySql": False,
-    #             }
-    #         }
-    #     )
+    bq_create_table_job = BigQueryInsertJobOperator(
+            task_id="bq_create_table_job",
+            configuration={
+                "query": {
+                    "query": CREATE_BQ_TBL_QUERY,
+                    "useLegacySql": False,
+                }
+            }
+        )
     
-    # bigquery_external_table_task >> bq_create_table_job
+    bigquery_external_table_task >> bq_create_table_job
 
 
     # bigquery_table_task = GCSToBigQueryOperator(
