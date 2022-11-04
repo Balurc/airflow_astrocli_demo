@@ -100,21 +100,23 @@ def move_data(project_id, league, bucket, bigquery_dataset):
                 },
             },
         )
-    CREATE_BQ_TBL_QUERY = (
-              f"CREATE OR REPLACE TABLE {bigquery_dataset}.{league} AS SELECT * FROM {bigquery_dataset}.{league}_external_table;"
-        )
+    # CREATE_BQ_TBL_QUERY = (
+    #           f"CREATE OR REPLACE TABLE {bigquery_dataset}.{league} AS SELECT * FROM {bigquery_dataset}.{league}_external_table;"
+    #     )
 
-    bq_create_table_job = BigQueryInsertJobOperator(
-            task_id="bq_create_table_job",
-            configuration={
-                "query": {
-                    "query": CREATE_BQ_TBL_QUERY,
-                    "useLegacySql": False,
-                }
-            }
-        )
+    # bq_create_table_job = BigQueryInsertJobOperator(
+    #         task_id="bq_create_table_job",
+    #         configuration={
+    #             "query": {
+    #                 "query": CREATE_BQ_TBL_QUERY,
+    #                 "useLegacySql": False,
+    #             }
+    #         }
+    #     )
     
-    bigquery_external_table_task >> bq_create_table_job
+    bigquery_external_table_task
+
+    # bigquery_external_table_task >> bq_create_table_job
 
 
     # bigquery_table_task = GCSToBigQueryOperator(
@@ -160,11 +162,15 @@ with DAG(
                 download_upload_data(url_template=EPL_URL_TEMPLATE, 
                                     local_csv_path_template=EPL_CSV_FILE_TEMPLATE, 
                                     gcs_path_template=EPL_GCS_PATH_TEMPLATE,
-                                    bucket=BUCKET,
-                                    league=league,
-                                    season=season,
-                                    bigquery_dataset=BIGQUERY_DATASET
-                                    )
+                                )
 
-        # with TaskGroup(group_id=f'group_bq_{league}') as tg2:
-        #     move_data(league=league, bucket=BUCKET, bigquery_dataset=BIGQUERY_DATASET)
+        with TaskGroup(group_id=f'group_bq_{league}') as tg2:
+            move_data(project_id=PROJECT_ID, league=league, bucket=BUCKET, bigquery_dataset=BIGQUERY_DATASET)
+
+
+
+# cat season-0910.csv | cut -f 2-5,8 -d ,  > xseason-0910.csv
+
+# bash_command=f"curl -sSLf {url_template} | cut -f 2-5,8 -d , > {local_csv_path_template}"
+
+# cat season-0910.csv | cut -f 2-5,8 -d, | sed '1s/$/,\season/; 2,$s/$/,\season-0910/' > test3.csv
