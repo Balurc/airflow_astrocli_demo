@@ -7,25 +7,23 @@ from airflow.operators.bash import BashOperator
 from airflow.operators.python import PythonOperator
 from airflow.utils.task_group import TaskGroup
 
-
 # To interact with GCS storage
 from google.cloud import storage
 
 # Google airflow operators to interact with Bigquery to create external table
 from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateExternalTableOperator, BigQueryInsertJobOperator
 
-
-# Import some env variables that we have in docker-compose.yml 
+# Import the env variables that we have in the Dockefile
 PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
 BUCKET = os.environ.get("GCP_GCS_BUCKET")
-
-# The second argument of each `.get` is what it will default to if it's empty.
 AIRFLOW_HOME = os.environ.get("AIRFLOW_HOME", "/opt/airflow/")
 BIGQUERY_DATASET = os.environ.get("BIGQUERY_DATASET", "european_football_leagues")
+
+# Data source url prefix 
 URL_PREFIX = "https://datahub.io/sports-data"
 
 
-# Note: takes 20 mins, at an upload speed of 800kbps. Faster if your internet has a better upload speed
+# A function to upload file to GCS
 def upload_to_gcs(bucket, object_name, local_file):
     """
     Ref: https://cloud.google.com/storage/docs/uploading-objects#storage-upload-object-python
@@ -45,14 +43,16 @@ def upload_to_gcs(bucket, object_name, local_file):
     blob = bucket.blob(object_name)
     blob.upload_from_filename(local_file)
 
-# a function to donwload, parquetize and upload yellow, green and FHV taxi data to google cloud storage
+# A function to donwload and upload data to GCS
 def download_upload_data(url_template, filter, local_csv_path_template, season, gcs_path_template):
-
+    
+    # A task to download the data from its source
     download_dataset_task = BashOperator(
             task_id="download_dataset_task",
             bash_command=f"curl -sSLf {url_template} | {filter} | sed '1s/$/,\season/; 2,$s/$/,\{season}/' > {local_csv_path_template}"
     )
-
+    
+    # A task to upload data to GCS
     local_to_gcs_task = PythonOperator(
             task_id="local_to_gcs_task",
             python_callable=upload_to_gcs,
@@ -62,12 +62,14 @@ def download_upload_data(url_template, filter, local_csv_path_template, season, 
                 "local_file": local_csv_path_template,
             },
     )
-
+    
+    # A task to remove previously downloaded data from Airflow database
     rm_task = BashOperator(
             task_id="rm_task",
             bash_command=f"rm {local_csv_path_template}"
     )
-
+    
+    # Define the task dependencies with the following execution order
     download_dataset_task >> local_to_gcs_task >> rm_task
 
 
