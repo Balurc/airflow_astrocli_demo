@@ -11,7 +11,7 @@ from airflow.utils.task_group import TaskGroup
 from google.cloud import storage
 
 # Google airflow operators to interact with Bigquery to create external table
-from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateExternalTableOperator, BigQueryInsertJobOperator
+from airflow.providers.google.cloud.operators.bigquery import BigQueryCreateExternalTableOperator
 
 # Import the env variables that we have in the Dockefile
 PROJECT_ID = os.environ.get("GCP_PROJECT_ID")
