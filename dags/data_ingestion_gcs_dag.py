@@ -81,6 +81,7 @@ default_args = {
     "retries": 1,
 }
 
+# The DAG to extract and load data to GCS
 with DAG(
     dag_id="extract_load_gcs_dag",
     schedule_interval=None,
@@ -115,7 +116,7 @@ with DAG(
                                         gcs_path_template=GCS_PATH_TEMPLATE
                                     )
 
-
+# The DAG to load data from GCS to BQ
 with DAG(
     dag_id="load_to_bq_dag",
     schedule_interval=None,
