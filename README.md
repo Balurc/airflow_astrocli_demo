@@ -1,9 +1,9 @@
 # Extract & Load Football Statistics to GCS & BQ
 
 This project aims to extract data from an external data source and load them in Google Cloud Storage & BigQuery.
-Please check the accompanying article for this repo. 
+Please check the <a href="https://medium.com/@baluramachandra90/extract-and-load-football-statistics-to-google-cloud-storage-bigquery-with-airflow-1a217227dbd1" target="_blank">accompanying article</a> for this repo. 
 
-<a href="https://medium.com/@baluramachandra90/extract-and-load-football-statistics-to-google-cloud-storage-bigquery-with-airflow-1a217227dbd1" target="_blank">here</a>
+
 
 ![](images/workflow_summary.png)
 
@@ -14,3 +14,8 @@ The data that I am going to extract is the football team statistics from top 5 E
 ![](images/data_source.png)
 
 ![alt text](images/example_data.png)
+
+### Additional Resources
+- <a href="https://docs.astronomer.io/learn" target="_blank">Learning Airflow with Astronomer</a>.
+- <a href="https://www.amazon.com/Data-Pipelines-Apache-Airflow-Harenslak/dp/1617296902" target="_blank">Data Pipelines with Apache Airflow</a>.
+- <a href="https://github.com/Balurc/data_eng_zoomcamp/tree/main/week2_data_ingestion" target="_blank">Week 2 course on data ingestion by DataTalksClub</a>.
