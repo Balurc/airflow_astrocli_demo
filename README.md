@@ -1,4 +1,4 @@
-# Extract & Load Football Statistics to GCS & BQ
+# Extract & Load Football Statistics to GCS & BigQuery
 
 This project aims to extract data from an external data source and load them in Google Cloud Storage & BigQuery.
 Please check the <a href="https://medium.com/@baluramachandra90/extract-and-load-football-statistics-to-google-cloud-storage-bigquery-with-airflow-1a217227dbd1" target="_blank">accompanying article</a> for this repo. 
